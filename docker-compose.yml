@@ -1,0 +1,87 @@
+# ==============================================================================
+# Ubuntu 开发环境 Docker Compose 配置
+# ==============================================================================
+version: '1.0'
+
+services:
+  ubuntu-dev:
+    # 镜像构建配置
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER_NAME: ${USER_NAME}
+        USER_UID: ${USER_UID}
+        USER_GID: ${USER_GID}
+        USER_GROUPS: ${USER_GROUPS}
+        USER_PASSWORD: ${USER_PASSWORD}
+        VNC_PASSWORD: ${VNC_PASSWORD}
+        TZ: ${TZ}
+    
+    # 容器名称
+    container_name: ${CONTAINER_NAME}
+    hostname: ${CONTAINER_HOSTNAME}
+    
+    # 端口映射
+    ports:
+      - "${VNC_PORT_HOST}:${VNC_PORT_CONTAINER}"
+      - "${WEB_PORT_HOST}:${WEB_PORT_CONTAINER}"
+      - "${SSH_PORT_HOST}:${SSH_PORT_CONTAINER}"
+    
+    # 数据卷挂载
+    volumes:
+      - type: bind
+        source: ${HOST_WORKSPACE_PATH}
+        target: ${CONTAINER_WORKSPACE_PATH}
+        read_only: false
+      - type: bind
+        source: ${HOST_CONFIG_PATH}
+        target: ${CONTAINER_CONFIG_PATH}
+        read_only: false
+      - type: bind
+        source: ${HOST_BACKUP_PATH}
+        target: ${CONTAINER_BACKUP_PATH}
+        read_only: false
+    
+    # 环境变量
+    env_file:
+      - .env
+    
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          cpus: '${CPU_LIMIT}'
+          memory: ${MEMORY_LIMIT}
+        reservations:
+          cpus: '1'
+          memory: 2g
+    
+    # 共享内存（图形界面必需）
+    shm_size: ${SHM_SIZE}
+    
+    # 网络配置
+    network_mode: bridge
+    
+    # 重启策略
+    restart: unless-stopped
+    
+    # 安全配置
+    privileged: false
+    security_opt:
+      - apparmor:unconfined
+    
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "5901"]
+      start_period: 60s
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    
+    # 日志配置
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
