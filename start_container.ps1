@@ -20,7 +20,8 @@ if (-not (Test-Path -Path ".env")) {
 
 # 2. 检查镜像是否存在
 $IMAGE_NAME = "dev-ide-ubuntu"
-if (-not (docker image inspect $IMAGE_NAME)) {
+$null = docker image inspect $IMAGE_NAME 2>&1
+if ($LASTEXITCODE -ne 0) {
     Write-Host "${RED}❌ 错误：镜像 '$IMAGE_NAME' 不存在！${NC}"
     Write-Host "请先执行 docker build 或 docker compose build 来构建镜像。"
     exit 1
@@ -29,13 +30,18 @@ if (-not (docker image inspect $IMAGE_NAME)) {
 # 3. 启动容器
 Write-Host "${GREEN}▶️  正在启动容器...${NC}"
 docker compose up -d --remove-orphans
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "${RED}❌ 容器启动失败！${NC}"
+    Write-Host "请运行 'docker compose logs' 查看详细错误。"
+    exit 1
+}
 
 # 4. 检查容器状态
 Write-Host "${GREEN}▶️  检查容器状态...${NC}"
 Start-Sleep -Seconds 2 # 等待2秒让容器初始化
 
-# 获取容器 ID
-$CONTAINER_ID = (docker ps -q --filter "name=dev-ide-ubuntu")
+# 获取容器 ID（使用 docker compose 确保精确匹配）
+$CONTAINER_ID = (docker compose ps -q dev-ide-ubuntu)
 
 if ([string]::IsNullOrEmpty($CONTAINER_ID)) {
     Write-Host "${RED}❌ 启动失败！容器启动后立即退出了。${NC}"
