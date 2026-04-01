@@ -1,10 +1,9 @@
 # ==============================================================================
 # Ubuntu 开发环境 Docker Compose 配置
 # ==============================================================================
-version: '1.0'
-
 services:
-  ubuntu-dev:
+  dev-ide-ubuntu:
+    image: dev-ide-ubuntu
     # 镜像构建配置
     build:
       context: .
@@ -16,6 +15,7 @@ services:
         USER_GROUPS: ${USER_GROUPS}
         USER_PASSWORD: ${USER_PASSWORD}
         VNC_PASSWORD: ${VNC_PASSWORD}
+        WEB_PASSWORD: ${WEB_PASSWORD}
         TZ: ${TZ}
     
     # 容器名称

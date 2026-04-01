@@ -12,6 +12,16 @@
 # ==============================================================================
 FROM ubuntu:24.04
 
+# 构建参数（必须有，否则 $USER_NAME 等在构建阶段为空）
+ARG USER_NAME
+ARG USER_UID
+ARG USER_GID
+ARG USER_GROUPS
+ARG USER_PASSWORD
+ARG VNC_PASSWORD
+ARG WEB_PASSWORD
+ARG TZ
+
 # ==============================================================================
 # 环境变量设置
 # ==============================================================================
@@ -183,7 +193,7 @@ RUN mkdir -p ${HOME}/workspace \
     /var/run/supervisor && \
     # 设置目录权限
     chown -R ${USER_NAME}:${USER_NAME} ${HOME} && \
-    chmod 755 ${HOME}/workspace \
+    chmod 755 ${HOME}/workspace && \
     chmod 700 ${HOME}/.ssh
 
 # ==============================================================================
