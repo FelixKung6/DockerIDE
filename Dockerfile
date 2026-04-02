@@ -203,7 +203,10 @@ RUN mkdir -p ${HOME}/workspace \
 USER root
 
 # 复制 Supervisor 配置文件
-COPY --chown=root:root supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# 配置文件的变量替换，敏感数据不直接写在Dockerfile中，而是通过环境变量传递，构建时替换
+RUN sed -i "s/__USER_NAME__/${USER_NAME}/g" /etc/supervisor/conf.d/supervisord.conf
 
 # ==============================================================================
 # 步骤 13：暴露端口
@@ -225,7 +228,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 # 步骤 15：设置工作目录和启动命令
 # ==============================================================================
 # 切换回普通用户运行（安全最佳实践）
-USER ${USER_NAME}
+USER root
 WORKDIR ${HOME}/workspace
 
 # 使用 Supervisor 管理所有服务
