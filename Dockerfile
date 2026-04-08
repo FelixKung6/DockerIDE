@@ -42,11 +42,9 @@ ENV RESOLUTION=1920x1200
 # ==============================================================================
 # 步骤 1：配置中国大陆软件源（加速下载）
 # ==============================================================================
-# 使用国内镜像源替换官方源
-RUN sed -i 's|http://.*archive.ubuntu.com|https://mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/ubuntu.sources && \
-    sed -i 's|http://.*security.ubuntu.com|https://mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/ubuntu.sources && \
-    sed -i 's|https://.*archive.ubuntu.com|https://mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/ubuntu.sources && \
-    sed -i 's|https://.*security.ubuntu.com|https://mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/ubuntu.sources && \
+# 使用国内镜像源替换官方源，保证软件包可以下载，必须使用非加密源，因为Ubuntu 24.04镜像没有内置证书，加密通信无证书会失败
+RUN sed -i 's|http://.*archive.ubuntu.com|http://mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/ubuntu.sources && \
+    sed -i 's|http://.*security.ubuntu.com|http://mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/ubuntu.sources && \
     # 更新软件包列表
     apt-get update
 
