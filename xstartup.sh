@@ -9,8 +9,6 @@ rm -rf /tmp/.X11-unix /tmp/.X*-lock
 
 # 设置显示环境
 export XKL_XMODMAP_DISABLE=1
-export DISPLAY=:1
-export DEBIAN_FRONTEND=noninteractive
 
 # 设置桌面分辨率
 xsetroot -solid "#3465a4"
